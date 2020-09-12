@@ -1,14 +1,29 @@
 require "faker"
 
-CaseContact.delete_all
-SupervisorVolunteer.delete_all
-CaseAssignment.delete_all
-CasaCase.delete_all
-User.delete_all
-CasaOrg.delete_all
-AllCasaAdmin.delete_all
+CaseContact.destroy_all
+SupervisorVolunteer.destroy_all
+CaseAssignment.destroy_all
+CasaCase.destroy_all
+User.destroy_all
+CasaOrg.destroy_all
+AllCasaAdmin.destroy_all
 
-pg_casa = CasaOrg.first_or_create!(name: "Prince George CASA")
+logo = CasaOrgLogo.new(
+  url: "media/src/images/logo.png",
+  alt_text: "CASA Logo",
+  size: "70x38"
+)
+
+pg_casa = CasaOrg.where(name: "Prince George CASA").first_or_create!(
+  casa_org_logo: logo,
+  display_name: "CASA / Prince George's County, MD",
+  address: "6811 Kenilworth Avenue, Suite 402 Riverdale, MD 20737",
+  footer_links: [
+    ["https://pgcasa.org/contact/", "Contact Us"],
+    ["https://pgcasa.org/subscribe-to-newsletter/", "Subscribe to newsletter"],
+    ["https://www.givedirect.org/give/givefrm.asp?CID=4450", "Donate"]
+  ]
+)
 
 # number casa cases to generate
 CASA_CASE_COUNT = 2
@@ -44,7 +59,7 @@ supervisor = Supervisor.first_or_create!(
 SupervisorVolunteer.create(supervisor: supervisor, volunteer: volunteer)
 
 # casa_admin user
-admin = CasaAdmin.first_or_create!(
+CasaAdmin.first_or_create!(
   casa_org_id: pg_casa.id,
   display_name: Faker::Name.name,
   email: "casa_admin1@example.com",
@@ -66,7 +81,7 @@ unless CasaCase.count > 0
     new_casa_case = CasaCase.create!(
       casa_org_id: pg_casa.id,
       case_number: case_number_generator,
-      transition_aged_youth: index % 2 == 0,
+      transition_aged_youth: index % 2 == 0
     )
     CaseAssignment.create!(
       casa_case: new_casa_case,
@@ -91,10 +106,17 @@ CaseContact.first_or_create!(
 ############################
 ## Other CASA Organization #
 ############################
-other_casa = CasaOrg.first_or_create!(name: "Other CASA org")
+other_casa = CasaOrg.where(name: "Other CASA org").first_or_create!(
+  display_name: "CASA / Other County, MD",
+  address: "123 Main St, Suite 101, Kennelwood, MD 01234",
+  footer_links: [
+    ["https://example.com/contact/", "Contact Us"],
+    ["https://example.com/subscribe-to-newsletter/", "Subscribe to newsletter"]
+  ]
+)
 
 CasaAdmin.where(
-  email: "other_casa_admin@example.com",
+  email: "other_casa_admin@example.com"
 ).first_or_create!(
   casa_org: other_casa,
   display_name: "Other Admin",
@@ -103,7 +125,7 @@ CasaAdmin.where(
 )
 
 Supervisor.where(
-  email: "other.supervisor@example.com",
+  email: "other.supervisor@example.com"
 ).first_or_create!(
   casa_org: other_casa,
   display_name: "Other Supervisor",
@@ -112,7 +134,7 @@ Supervisor.where(
 )
 
 Volunteer.where(
-  email: "other.volunteer@example.com",
+  email: "other.volunteer@example.com"
 ).first_or_create!(
   casa_org: other_casa,
   display_name: "Other Volunteer",

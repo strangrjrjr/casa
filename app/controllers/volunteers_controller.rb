@@ -20,7 +20,6 @@ class VolunteersController < ApplicationController
   end
 
   def edit
-    @available_casa_cases = CasaCase.all.order(:case_number)
   end
 
   def update
